@@ -8,11 +8,11 @@ Web streaming and detection human sleepiness in a raspberry pi camera.
 ![Archtect](doc/archetect.png)
 
 # Requirement
-**Devices**
+## Devices
 * Raspberry Pi 4
 * Camera Module V2 For raspberry pi
 
-**Packages**
+## Packages
 * python3
 * flask
 * opencv
