@@ -5,13 +5,14 @@
 
 import threading
 import time
-try:
-    from greenlet import getcurrent as get_ident
-except ImportError:
-    try:
-        from thread import get_ident
-    except ImportError:
-        from _thread import get_ident
+from greenlet import getcurrent as get_ident
+# try:
+#     from greenlet import getcurrent as get_ident
+# except ImportError:
+#     try:
+#         from thread import get_ident
+#     except ImportError:
+#         from _thread import get_ident
 
 class CameraEvent(object):
     """An Event-like class that signals all active clients when a new frame is available.
