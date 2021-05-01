@@ -28,7 +28,7 @@ pip3 install flask opencv-python dlib imutils scipy greenlet
 # Usage
 Run application
 ```bash
-python3 main.py
+python3 src/main.py
 ```
 
 Open URL
