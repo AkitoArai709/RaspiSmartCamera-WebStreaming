@@ -38,8 +38,8 @@ class Camera(BaseCamera):
             # read current frame
             _, frame = camera.read()
 
-            frame = Camera.__drawingFps(frame)
-            yield cv2.imencode('.jpg', DetectionSleepiness.getDetectResultFrame(frame))[1].tobytes()
+            frame = DetectionSleepiness.getDetectResultFrame(frame)
+            yield cv2.imencode('.jpg', Camera.__drawingFps(frame))[1].tobytes()
             
     @staticmethod
     def __drawingFps(frame):
