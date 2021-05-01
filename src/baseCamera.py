@@ -10,9 +10,12 @@ from abc import abstractmethod
 from cameraEvent import CameraEvent
 
 class BaseCamera(object):
-    thread = None  # background thread that reads frames from camera
-    frame = None  # current frame is stored here by background thread
-    last_access = 0  # time of last client access to the camera
+    # background thread that reads frames from camera
+    thread = None
+    # current frame is stored here by background thread
+    frame = None
+    # time of last client access to the camera
+    last_access = 0
     event = CameraEvent()
 
     def __init__(self):

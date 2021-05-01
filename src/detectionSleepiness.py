@@ -24,14 +24,15 @@ class DetectionSleepiness:
     # Drawing color
     faceColor = (255, 255, 255)
     msgColor = (0, 0, 255)
-    
-    # EAR buffer
-    # Using for detection sleepiness
-    EARbuffer = Buffer(50)
 
     # Minimum buffer size required for detection sleepiness 
+    bufferSize = 50
     requiredBufferSize = 30
     SleepinessEARThreshold = 0.58
+
+    # EAR buffer
+    # Using for detection sleepiness
+    EARbuffer = Buffer(bufferSize)
 
     @staticmethod
     def getDetectResultFrame(frame):
@@ -99,10 +100,10 @@ class DetectionSleepiness:
                         (220,30), cv2.FONT_HERSHEY_DUPLEX, 1, DetectionSleepiness.msgColor, 1, 1)
                 # drawing sleepiness result
                 if isSleepy:
-                    cv2.putText(frame,"Sleepy eyes. Wake up!",
+                    cv2.putText(frame,"Look sleepy!",
                         (10,70), cv2.FONT_HERSHEY_DUPLEX, 1, DetectionSleepiness.msgColor, 1, 1)
         else:
-            # Extract the contents of the buffer if it is not detected
+            # extract the contents of the buffer if it is not detected
             DetectionSleepiness.EARbuffer.pop()
 
         return frame, isSleepy
