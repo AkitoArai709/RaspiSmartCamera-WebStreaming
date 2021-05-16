@@ -13,29 +13,30 @@ class DetectionSleepiness:
     """ Detection Sleepiness.
         Drawing detection result in image frame.
     """
-    # Learning result model file path
-    faceCascadePath = "./models/opencv/haarcascade_frontalface_alt2.xml"
-    faceLandmarksPath = "./models/dlib/shape_predictor_68_face_landmarks.dat"
-    
-    # Learning model
-    faceCascade = cv2.CascadeClassifier(faceCascadePath)
-    faceLandmarksCascade = dlib.shape_predictor(faceLandmarksPath)
-    
-    # Drawing color
-    faceColor = (255, 255, 255)
-    msgColor = (0, 0, 255)
 
-    # Minimum buffer size required for detection sleepiness 
-    bufferSize = 50
-    requiredBufferSize = 30
-    SleepinessEARThreshold = 0.58
+    def __init__(self):
+        # Learning result model file path
+        self.faceCascadePath = "./models/opencv/haarcascade_frontalface_alt2.xml"
+        self.faceLandmarksPath = "./models/dlib/shape_predictor_68_face_landmarks.dat"
+        
+        # Learning model
+        self.faceCascade = cv2.CascadeClassifier(self.faceCascadePath)
+        self.faceLandmarksCascade = dlib.shape_predictor(self.faceLandmarksPath)
+        
+        # Drawing color
+        self.faceColor = (255, 255, 255)
+        self.msgColor = (0, 0, 255)
 
-    # EAR buffer
-    # Using for detection sleepiness
-    EARbuffer = Buffer(bufferSize)
+        # Minimum buffer size required for detection sleepiness 
+        self.bufferSize = 50
+        self.requiredBufferSize = 30
+        self.SleepinessEARThreshold = 0.58
 
-    @staticmethod
-    def getDetectResultFrame(frame):
+        # EAR buffer
+        # Using for detection sleepiness
+        self.EARbuffer = Buffer(self.bufferSize)
+
+    def getDetectResultFrame(self, frame):
         """ Get the camera frame of the detection sleepiness result.
 
         Args:
@@ -44,11 +45,10 @@ class DetectionSleepiness:
         Returns:
             ndarray: The camera frame of the detection sleepiness result.
         """
-        frame, _ = DetectionSleepiness.__detection(frame, True)
+        frame, _ = self.__detection(frame, True)
         return frame
 
-    @staticmethod
-    def isSleepy(frame):
+    def isSleepy(self, frame):
         """ Get detection sleepiness result.
 
         Args:
@@ -57,11 +57,10 @@ class DetectionSleepiness:
         Returns:
             bool: detection sleepiness result. True or False.
         """
-        _, ret = DetectionSleepiness.__detection(frame, False)
+        _, ret = self.__detection(frame, False)
         return ret
 
-    @staticmethod
-    def __detection(frame, isDrawing):
+    def __detection(self, frame, isDrawing):
         """ Perform detection.
 
         Args:
@@ -74,42 +73,41 @@ class DetectionSleepiness:
         """
         isSleepy = None
         # detect person face
-        rect = DetectionSleepiness.faceCascade.detectMultiScale(frame,
+        rect = self.faceCascade.detectMultiScale(frame,
                     scaleFactor=1.11, minNeighbors=3, minSize=(200, 200))
         
         if len(rect) > 0:
             # resize to face size
             # convert frame to dlib rectangle
-            resizedFace = DetectionSleepiness.__resizeFace(frame, rect)
+            resizedFace = self.__resizeFace(frame, rect)
             faceDlibRectangle = dlib.rectangle(0, 0, resizedFace.shape[1], resizedFace.shape[0])
 
             # caltulation EAR
             # detect sleepiness
-            left_EAR, right_EAR = DetectionSleepiness.__getEARs(resizedFace, faceDlibRectangle)
-            isSleepy = DetectionSleepiness.__detectSleepiness(left_EAR, right_EAR)
+            left_EAR, right_EAR = self.__getEARs(resizedFace, faceDlibRectangle)
+            isSleepy = self.__detectSleepiness(left_EAR, right_EAR)
 
             # drawing result
             if isDrawing:
                 # drawing a square around the face
                 x, y, w, h = rect[0,:]
-                cv2.rectangle(frame, (x, y), (x+w, y+h), DetectionSleepiness.faceColor)
+                cv2.rectangle(frame, (x, y), (x+w, y+h), self.faceColor)
                 # drawing left & right EAR(eyes aspect ratio)
                 cv2.putText(frame,"leftEAR:{}".format(round(left_EAR,2)),
-                        (10,30), cv2.FONT_HERSHEY_DUPLEX, 1, DetectionSleepiness.msgColor, 1, 1)
+                        (10,30), cv2.FONT_HERSHEY_DUPLEX, 1, self.msgColor, 1, 1)
                 cv2.putText(frame,"rightEAR:{}".format(round(right_EAR,2)),
-                        (220,30), cv2.FONT_HERSHEY_DUPLEX, 1, DetectionSleepiness.msgColor, 1, 1)
+                        (220,30), cv2.FONT_HERSHEY_DUPLEX, 1, self.msgColor, 1, 1)
                 # drawing sleepiness result
                 if isSleepy:
                     cv2.putText(frame,"Look sleepy!",
-                        (10,70), cv2.FONT_HERSHEY_DUPLEX, 1, DetectionSleepiness.msgColor, 1, 1)
+                        (10,70), cv2.FONT_HERSHEY_DUPLEX, 1, self.msgColor, 1, 1)
         else:
             # extract the contents of the buffer if it is not detected
-            DetectionSleepiness.EARbuffer.pop()
+            self.EARbuffer.pop()
 
         return frame, isSleepy
 
-    @staticmethod
-    def __detectSleepiness(left_EAR, right_EAR):
+    def __detectSleepiness(self, left_EAR, right_EAR):
         """ Detect sleepiness from EAR.
 
         Args:
@@ -120,15 +118,14 @@ class DetectionSleepiness:
             bool: Detection sleepiness result.
         """
         ret = True
-        DetectionSleepiness.EARbuffer.push(left_EAR + right_EAR)
-        if DetectionSleepiness.EARbuffer.size() >= DetectionSleepiness.requiredBufferSize and \
-            DetectionSleepiness.EARbuffer.getAvg() > DetectionSleepiness.SleepinessEARThreshold:
+        self.EARbuffer.push(left_EAR + right_EAR)
+        if self.EARbuffer.size() >= self.requiredBufferSize and \
+            self.EARbuffer.getAvg() > self.SleepinessEARThreshold:
             ret = False
 
         return ret
 
-    @staticmethod
-    def __getEARs(frame, face):
+    def __getEARs(self, frame, face):
         """ Calculate and get the EAR(eyes aspect ratio).
 
         Args:
@@ -139,16 +136,15 @@ class DetectionSleepiness:
             left_EAR (float64): Left eye EAR.
             right_EAR (float64): Right eye EAR.
         """
-        rect = DetectionSleepiness.faceLandmarksCascade(frame, face)
+        rect = self.faceLandmarksCascade(frame, face)
         rect = face_utils.shape_to_np(rect)
 
-        left_EAR = DetectionSleepiness.__calcEAR(rect[42:48])
-        right_EAR = DetectionSleepiness.__calcEAR(rect[36:42])
+        left_EAR = self.__calcEAR(rect[42:48])
+        right_EAR = self.__calcEAR(rect[36:42])
 
         return left_EAR, right_EAR
 
-    @staticmethod
-    def __calcEAR(eye):
+    def __calcEAR(self, eye):
         """ Calculate the EAR(eyes aspect ratio)
             EAR = (||p2-p6|| + ||p3-p5||) / (2 * ||p1-p4||).
 
@@ -164,8 +160,7 @@ class DetectionSleepiness:
         eye_ear = (A + B) / (2.0 * C)
         return round(eye_ear, 3)
 
-    @staticmethod
-    def __resizeFace(frame, range):
+    def __resizeFace(self, frame, range):
         """ Resize camera frame.
 
         Args:

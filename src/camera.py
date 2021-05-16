@@ -17,6 +17,8 @@ class Camera(BaseCamera):
     tick = 0
     fpsColor = (0, 255, 0)
 
+    infApp = DetectionSleepiness()
+
     def __init__(self):
         super().__init__()
 
@@ -38,7 +40,7 @@ class Camera(BaseCamera):
             # read current frame
             _, frame = camera.read()
 
-            frame = DetectionSleepiness.getDetectResultFrame(frame)
+            frame = Camera.infApp.getDetectResultFrame(frame)
             yield cv2.imencode('.jpg', Camera.__drawingFps(frame))[1].tobytes()
             
     @staticmethod
